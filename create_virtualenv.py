@@ -138,7 +138,9 @@ def create_virtualenv(root_path, target, wheels_dir):
     :param unicode wheels_dir: Absolute path where the wheels of pip and setuptools live or get downloaded to
     :return: None
     """
-    venv_bin = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'virtualenv.py')
+    # this is needed to get this filename even if executed by execfile()
+    this_file = inspect.getframeinfo(inspect.currentframe()).filename
+    venv_bin = os.path.join(os.path.abspath(os.path.dirname(this_file)), 'virtualenv.py')
     cmd = [sys.executable, venv_bin, os.path.join(root_path, target), '--no-site-packages', '--extra-search-dir', wheels_dir]
 
     if call(cmd) != 0:
