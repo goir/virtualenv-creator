@@ -10,6 +10,7 @@ import subprocess
 import sys
 import os
 import urllib2
+import shutil
 
 WHEEL_PIP = 'https://pypi.python.org/packages/py2.py3/p/pip/pip-1.5.6-py2.py3-none-any.whl#md5=4d4fb4b69df6731c7aeaadd6300bc1f2'
 WHEEL_SETUPTOOLS = 'https://pypi.python.org/packages/3.4/s/setuptools/setuptools-5.7-py2.py3-none-any.whl#md5=94eedce8d9b793d4affa4a85cd45edfa'
@@ -139,11 +140,15 @@ def create_virtualenv(root_path, target, wheels_dir):
     :param unicode wheels_dir: Absolute path where the wheels of pip and setuptools live or get downloaded to
     :return: None
     """
+    target_dir = os.path.join(root_path, target)
     # this is needed to get this filename even if executed by execfile()
     this_file = inspect.getframeinfo(inspect.currentframe()).filename
     venv_bin = os.path.join(os.path.abspath(os.path.dirname(this_file)), 'virtualenv.py')
-    cmd = [sys.executable, venv_bin, os.path.join(root_path, target), '--no-site-packages', '--extra-search-dir', wheels_dir]
+    if os.path.isdir(target_dir):
+        shutil.rmtree(target_dir)
+        print(color("Deleted old env in {0}".format(target_dir), 'green'))
 
+    cmd = [sys.executable, venv_bin, target_dir, '--no-site-packages', '--extra-search-dir', wheels_dir]
     if call(cmd) != 0:
         # most likeley pip and setuptools wheels could not be found
         # download them to wheels_dir.
@@ -151,7 +156,7 @@ def create_virtualenv(root_path, target, wheels_dir):
         download_wheel(WHEEL_SETUPTOOLS, wheels_dir)
         if call(cmd) != 0:
             raise RuntimeError(color('Could not setup virtualenv', 'red'))
-    print(color("Created virtualenv in {0}".format(target), 'green'))
+    print(color("Created virtualenv in {0}".format(target_dir), 'green'))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
