@@ -12,8 +12,8 @@ import os
 import urllib2
 import shutil
 
-WHEEL_PIP = 'https://pypi.python.org/packages/py2.py3/p/pip/pip-1.5.6-py2.py3-none-any.whl#md5=4d4fb4b69df6731c7aeaadd6300bc1f2'
-WHEEL_SETUPTOOLS = 'https://pypi.python.org/packages/3.4/s/setuptools/setuptools-7.0-py2.py3-none-any.whl#md5=918e7e5ea108507e1ffbbdfccc3496b1'
+WHEEL_PIP = 'https://pypi.python.org/packages/py2.py3/p/pip/pip-6.0.3-py2.py3-none-any.whl#md5=1ac546485f75a8cf257a8f1a40aa51f5'
+WHEEL_SETUPTOOLS = 'https://pypi.python.org/packages/3.4/s/setuptools/setuptools-9.1-py2.py3-none-any.whl#md5=6bfa6978f0070ec62fcb9afd9a5fe7cd'
 
 
 class Colors(object):
