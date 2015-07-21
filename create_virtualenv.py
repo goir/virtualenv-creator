@@ -12,8 +12,8 @@ import os
 import urllib2
 import shutil
 
-WHEEL_PIP = 'https://pypi.python.org/packages/py2.py3/p/pip/pip-1.5.6-py2.py3-none-any.whl#md5=4d4fb4b69df6731c7aeaadd6300bc1f2'
-WHEEL_SETUPTOOLS = 'https://pypi.python.org/packages/3.4/s/setuptools/setuptools-9.1-py2.py3-none-any.whl#md5=6bfa6978f0070ec62fcb9afd9a5fe7cd'
+WHEEL_PIP = 'https://pypi.python.org/packages/py2.py3/p/pip/pip-7.1.0-py2.py3-none-any.whl#md5=b108384a762825ec20345bb9b5b7209f'
+WHEEL_SETUPTOOLS = 'https://pypi.python.org/packages/3.4/s/setuptools/setuptools-18.0.1-py2.py3-none-any.whl#md5=19c0c145c3d2a615b0a33f0aeddd1c02'
 
 
 class Colors(object):
@@ -148,7 +148,7 @@ def create_virtualenv(root_path, target, wheels_dir):
         shutil.rmtree(target_dir)
         print(color("Deleted old env in {0}".format(target_dir), 'green'))
 
-    cmd = [sys.executable, venv_bin, target_dir, '--no-site-packages', '--extra-search-dir', wheels_dir]
+    cmd = [sys.executable, venv_bin, target_dir, '--no-wheel', '--extra-search-dir', wheels_dir]
     if call(cmd) != 0:
         # most likeley pip and setuptools wheels could not be found
         # download them to wheels_dir.
