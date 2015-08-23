@@ -12,8 +12,8 @@ import os
 import urllib2
 import shutil
 
-WHEEL_PIP = 'https://pypi.python.org/packages/py2.py3/p/pip/pip-7.1.0-py2.py3-none-any.whl#md5=b108384a762825ec20345bb9b5b7209f'
-WHEEL_SETUPTOOLS = 'https://pypi.python.org/packages/3.4/s/setuptools/setuptools-18.0.1-py2.py3-none-any.whl#md5=19c0c145c3d2a615b0a33f0aeddd1c02'
+WHEEL_PIP = 'https://pypi.python.org/packages/py2.py3/p/pip/pip-7.1.2-py2.py3-none-any.whl#md5=5ff9fec0be479e4e36df467556deed4d'
+WHEEL_SETUPTOOLS = 'https://pypi.python.org/packages/3.4/s/setuptools/setuptools-18.2-py2.py3-none-any.whl#md5=2b79c46f12ca11fca3720dcf0f327086'
 
 
 class Colors(object):
@@ -131,6 +131,16 @@ def download_wheel(url, target_dir):
                 raise RuntimeError(color('md5 hash of file {0} does not match'.format(filename), 'red'))
             fp.write(data)
 
+def cleanup_wheels(url, target_dir):
+    filename, _ = os.path.basename(url).split('#')
+    files = os.listdir(target_dir)
+
+    package_name = filename.split('-', 1)[0]
+    for f in files:
+        if f.startswith(package_name) and not f == filename:
+            print(color('Removing old version of {0}: {1}'.format(package_name, f), 'green'))
+            os.unlink(os.path.join(target_dir, f))
+
 
 def create_virtualenv(root_path, target, wheels_dir):
     """ setup virtualenv in :param:target. Downloads Pip and Setuptools if they dont exist in *wheels_dir*.
@@ -147,6 +157,9 @@ def create_virtualenv(root_path, target, wheels_dir):
     if os.path.isdir(target_dir):
         shutil.rmtree(target_dir)
         print(color("Deleted old env in {0}".format(target_dir), 'green'))
+
+    cleanup_wheels(WHEEL_PIP, wheels_dir)
+    cleanup_wheels(WHEEL_SETUPTOOLS, wheels_dir)
 
     cmd = [sys.executable, venv_bin, target_dir, '--no-wheel', '--extra-search-dir', wheels_dir]
     if call(cmd) != 0:
