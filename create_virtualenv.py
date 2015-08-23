@@ -62,38 +62,6 @@ def check_files_exists(req_files):
             print(color('Using requirements file {0}'.format(req_file), 'green'))
 
 
-def create_wheels(req_file):
-    """ Creates wheels in *wheel_dir* using *req_file*
-
-    :param unicode req_file:
-    :return: None
-    """
-    if call(['pip', 'install', '-U', 'wheel']) != 0:
-        raise RuntimeError(color('could not install/update wheel', 'red'))
-    print(color('Creating wheels from {0} into {1}'.format(req_file, args.wheels_dir), 'green'))
-
-    if call(['pip', 'wheel', '--wheel-dir=%s' % args.wheels_dir, '-r', req_file]) != 0:
-        raise RuntimeError(color('Creation of wheels from file {0} failed.'.format(req_file), 'red'))
-
-
-def install_from_wheels(req_files, wheels_dir):
-    """ Install requirements from wheels in *wheels_dir*. If this fails create_wheels() will be executed to (re-)create all wheels
-
-    :param list req_files: List of requirement filenames
-    :param unicode wheels_dir: dir where the wheels live
-    :return: None
-    """
-    for req_file in req_files:
-        print(color("Installing requirements from {0}".format(req_file), 'green'))
-        install_cmd = ['pip', 'install', '-U', '--use-wheel', '--no-index', '--find-links=%s' % wheels_dir, '-r', req_file]
-        if call(install_cmd) != 0:
-            print(color('Not all requirements found in wheels dir. Re-creating all wheels', 'yellow'))
-            create_wheels(req_file)
-            # try again with the new wheels
-            if call(install_cmd) != 0:
-                raise RuntimeError(color("Installation of requirements from file {0} using wheels {1} failed".format(req_file, wheels_dir), 'red'))
-
-
 def install_from_pypy(req_files):
     """ Install requirements from :param:req_files using live pypy.
 
@@ -130,6 +98,7 @@ def download_wheel(url, target_dir):
                 os.unlink(destination)
                 raise RuntimeError(color('md5 hash of file {0} does not match'.format(filename), 'red'))
             fp.write(data)
+
 
 def cleanup_wheels(url, target_dir):
     filename, _ = os.path.basename(url).split('#')
@@ -171,6 +140,7 @@ def create_virtualenv(root_path, target, wheels_dir):
             raise RuntimeError(color('Could not setup virtualenv', 'red'))
     print(color("Created virtualenv in {0}".format(target_dir), 'green'))
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--debug', action='store_true', help="activate debug output")
@@ -180,9 +150,12 @@ if __name__ == '__main__':
     parser.add_argument('--wheels-dir', type=str, default=os.path.expanduser('~/.python_wheels'), help="install from wheels. If a wheel does not exist it will be created.")
     args = parser.parse_args()
 
+    # --wheels and -w does nothing anymore, pip creates wheels on its own and caches them!
+
     if not args.debug:
         def a(type, value, traceback):
             print(value)
+
         sys.excepthook = a
 
     # check if any environment is active
@@ -208,12 +181,9 @@ if __name__ == '__main__':
 
     # activate the new virtualenv
     activate_this = os.path.join(root_path, "%s/bin/activate_this.py" % args.target)
-    exec(compile(open(activate_this).read(), activate_this, 'exec'), dict(__file__=activate_this))
+    exec (compile(open(activate_this).read(), activate_this, 'exec'), dict(__file__=activate_this))
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-    if args.wheels:
-        install_from_wheels(requirement_files, args.wheels_dir)
-    else:
-        install_from_pypy(requirement_files)
+    install_from_pypy(requirement_files)
 
     print(color('Successfully installed all requirements from {0}'.format(', '.join(requirement_files)), 'green'))
