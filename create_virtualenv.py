@@ -70,7 +70,7 @@ def install_from_pypy(req_files):
     """
     for req_file in req_files:
         print(color("Installing requirements from {0}".format(req_file), 'green'))
-        install_cmd = ['pip', 'install', '--no-cache-dir', '-U', '-r', req_file]
+        install_cmd = ['pip', 'install', '-U', '-r', req_file]
         if call(install_cmd) != 0:
             raise RuntimeError(color("Installation of requirements from {0} using pypy failed".format(req_file), 'red'))
 
@@ -146,9 +146,11 @@ if __name__ == '__main__':
     parser.add_argument('--debug', action='store_true', help="activate debug output")
     parser.add_argument('--dev', '-d', action='store_true', help='install development requirements (requirements-dev.txt)')
     parser.add_argument('--target', '-t', type=str, default="env", help="where to put the new env (default: %(default)s)")
-    parser.add_argument('--wheels', '-w', action='store_true', help="unused!")
-    parser.add_argument('-no-symlinks', '-c', action='store_true', help="Don't create symlinks, always copy files when creating virtualenv")
+    parser.add_argument('--wheels', '-w', action='store_true', help="install from wheels. If a wheel does not exist it will be created")
+    parser.add_argument('--wheels-dir', type=str, default=os.path.expanduser('~/.python_wheels'), help="install from wheels. If a wheel does not exist it will be created.")
     args = parser.parse_args()
+
+    # --wheels and -w does nothing anymore, pip creates wheels on its own and caches them!
 
     if not args.debug:
         def a(type, value, traceback):
@@ -160,9 +162,10 @@ if __name__ == '__main__':
     if hasattr(sys, 'real_prefix'):
         raise RuntimeError(color('Please deactivate the current virtualenv using "deactivate"', 'red'))
 
-    cache_dir = os.path.expanduser('~/.cache/pip')
+    print(color("Using wheels dir {0}".format(args.wheels_dir), 'green'))
+    # create the wheels dir if we use wheels
     try:
-        os.mkdir(cache_dir, 0o777)
+        os.mkdir(args.wheels_dir, 0o777)
     except OSError as e:
         # file already exists, ignore this
         pass
@@ -174,7 +177,7 @@ if __name__ == '__main__':
     check_files_exists(requirement_files)
 
     root_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../')
-    create_virtualenv(root_path, args.target, cache_dir)
+    create_virtualenv(root_path, args.target, args.wheels_dir)
 
     # activate the new virtualenv
     activate_this = os.path.join(root_path, "%s/bin/activate_this.py" % args.target)
