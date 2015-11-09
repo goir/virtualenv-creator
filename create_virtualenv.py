@@ -111,7 +111,7 @@ def cleanup_wheels(url, target_dir):
             os.unlink(os.path.join(target_dir, f))
 
 
-def create_virtualenv(root_path, target, wheels_dir):
+def create_virtualenv(root_path, target, wheels_dir, copy=False):
     """ setup virtualenv in :param:target. Downloads Pip and Setuptools if they dont exist in *wheels_dir*.
 
     :param unicode root_path: Absolute path
@@ -131,6 +131,9 @@ def create_virtualenv(root_path, target, wheels_dir):
     cleanup_wheels(WHEEL_SETUPTOOLS, wheels_dir)
 
     cmd = [sys.executable, venv_bin, target_dir, '--no-wheel', '--extra-search-dir', wheels_dir]
+    if copy:
+        cmd.append('--always-copy')
+
     if call(cmd) != 0:
         # most likeley pip and setuptools wheels could not be found
         # download them to wheels_dir.
@@ -148,6 +151,7 @@ if __name__ == '__main__':
     parser.add_argument('--target', '-t', type=str, default="env", help="where to put the new env (default: %(default)s)")
     parser.add_argument('--wheels', '-w', action='store_true', help="install from wheels. If a wheel does not exist it will be created")
     parser.add_argument('--wheels-dir', type=str, default=os.path.expanduser('~/.python_wheels'), help="install from wheels. If a wheel does not exist it will be created.")
+    parser.add_argument('--always-copy', '-c', action='store_true', help='Don\'t create symlinks (use on windows and/or shared folders)')
     args = parser.parse_args()
 
     # --wheels and -w does nothing anymore, pip creates wheels on its own and caches them!
@@ -177,7 +181,7 @@ if __name__ == '__main__':
     check_files_exists(requirement_files)
 
     root_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../')
-    create_virtualenv(root_path, args.target, args.wheels_dir)
+    create_virtualenv(root_path, args.target, args.wheels_dir, args.always_copy)
 
     # activate the new virtualenv
     activate_this = os.path.join(root_path, "%s/bin/activate_this.py" % args.target)
