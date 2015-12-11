@@ -13,7 +13,7 @@ import urllib2
 import shutil
 
 WHEEL_PIP = 'https://pypi.python.org/packages/py2.py3/p/pip/pip-7.1.2-py2.py3-none-any.whl#md5=5ff9fec0be479e4e36df467556deed4d'
-WHEEL_SETUPTOOLS = 'https://pypi.python.org/packages/3.4/s/setuptools/setuptools-18.2-py2.py3-none-any.whl#md5=2b79c46f12ca11fca3720dcf0f327086'
+WHEEL_SETUPTOOLS = 'https://pypi.python.org/packages/3.5/s/setuptools/setuptools-18.7.1-py2.py3-none-any.whl#md5=a793e7b7ad3a91ca796f2e3bbd4ac355'
 
 
 class Colors(object):
