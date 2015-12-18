@@ -68,9 +68,10 @@ def install_from_pypy(req_files):
     :param list req_files: List of requirement filenames
     :return: None
     """
+    call(['pip', 'install', '-U', 'pip-accel'])
     for req_file in req_files:
         print(color("Installing requirements from {0}".format(req_file), 'green'))
-        install_cmd = ['pip', 'install', '-U', '-r', req_file]
+        install_cmd = ['pip-accel', 'install', '-r', req_file]
         if call(install_cmd) != 0:
             raise RuntimeError(color("Installation of requirements from {0} using pypy failed".format(req_file), 'red'))
 
