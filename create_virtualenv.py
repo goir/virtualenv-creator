@@ -167,6 +167,9 @@ if __name__ == '__main__':
     if hasattr(sys, 'real_prefix'):
         raise RuntimeError(color('Please deactivate the current virtualenv using "deactivate"', 'red'))
 
+    if 'VIRTUAL_ENV' in os.environ:
+        del os.environ['VIRTUAL_ENV']
+
     print(color("Using wheels dir {0}".format(args.wheels_dir), 'green'))
     # create the wheels dir if we use wheels
     try:
