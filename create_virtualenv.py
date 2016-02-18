@@ -72,6 +72,8 @@ def install_from_pypy(req_files):
     for req_file in req_files:
         print(color("Installing requirements from {0}".format(req_file), 'green'))
         install_cmd = ['pip-accel', 'install', '-r', req_file]
+        if os.path.isfile('constraints.txt'):
+            install_cmd.extend(['-c', 'constraints.txt'])
         if call(install_cmd) != 0:
             raise RuntimeError(color("Installation of requirements from {0} using pypy failed".format(req_file), 'red'))
 
